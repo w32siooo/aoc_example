@@ -1,4 +1,9 @@
-FROM groovy:latest
-COPY . /solution
-WORKDIR /solution
-CMD groovy day1.groovy
+FROM gradle:alpine AS base
+WORKDIR /src
+COPY ./ .
+RUN gradle build
+
+FROM openjdk:17-alpine
+COPY --from=BASE /src/build/libs/app.jar /app.jar
+COPY input.txt .
+CMD java -jar /app.jar

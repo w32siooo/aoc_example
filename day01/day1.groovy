@@ -1,3 +1,4 @@
+package com.andreas
 import java.io.*
 println "groovy"
 
