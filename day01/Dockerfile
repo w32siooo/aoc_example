@@ -1,5 +1,4 @@
-FROM alpine:latest
+FROM groovy:latest
 COPY . /solution
 WORKDIR /solution
-
-CMD ./solution.sh
+CMD groovy day1.groovy
