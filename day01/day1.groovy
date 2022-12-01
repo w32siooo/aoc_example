@@ -1,5 +1,5 @@
 import java.io.*
-
+println "groovy"
 File file = new File("input.txt")
 
 def list = [] // empty list
