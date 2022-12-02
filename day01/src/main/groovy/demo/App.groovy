@@ -3,11 +3,14 @@
  */
 package demo
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class App {
-    static String getDay1() {
+    static getDay1() {
         File file = new File("input.txt")
 
-        def list = []
+        def list = [] as ArrayList<Integer>
         def count = 0
         def largest = 0
         file.eachLine { line ->
@@ -24,6 +27,7 @@ class App {
                 }
             }
         }
+
         if (System.getenv("part") == "part1") {
             return largest
         }
