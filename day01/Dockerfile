@@ -6,4 +6,4 @@ RUN gradle clean build
 FROM openjdk
 COPY input.txt .
 COPY --from=BASE /src/build/libs/ .
-CMD java -jar app.jar
+CMD java -jar demo.jar
