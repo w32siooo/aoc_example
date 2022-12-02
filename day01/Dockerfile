@@ -1,9 +1,9 @@
-FROM gradle:alpine as BASE
+FROM gradle as BASE
 WORKDIR /src
 COPY ./ .
-RUN gradle build
+RUN gradle clean build
 
-FROM openjdk:17-alpine
-COPY --from=BASE /src/build/libs/app.jar /app.jar
+FROM openjdk
 COPY input.txt .
-CMD java -jar /app.jar
+COPY --from=BASE /src/build/libs/ .
+CMD java -jar app.jar
