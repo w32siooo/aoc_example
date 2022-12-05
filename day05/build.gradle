@@ -1,0 +1,40 @@
+
+plugins {
+    id 'groovy' // <1>
+
+    id 'application' // <2>
+}
+
+repositories {
+    mavenCentral() // <3>
+}
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:3.0.13' // <4>
+
+    implementation 'com.google.guava:guava:31.1-jre' // <5>
+
+    testImplementation 'org.spockframework:spock-core:2.2-groovy-3.0' // <6>
+    testImplementation 'junit:junit:4.13.2'
+}
+application {
+    mainClass = 'demo.App' // <7>
+}
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes (
+                'Class-Path': configurations.runtimeClasspath.files.collect { it.getName() }.join(' '),
+                'Main-Class': 'demo.App'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect {it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform() // <8>
+}
