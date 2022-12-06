@@ -1,5 +1,7 @@
 puts "Crystal"
-if ENV["part"] == "part1"
+ENV["part"] == "part1" ? part1 : part2
+
+def part1
   content = File.read("input.txt")
   res = 0 
   content.each_line do |line|
@@ -9,7 +11,9 @@ if ENV["part"] == "part1"
     res += combined.first[0].ord > 90 ? combined.first[0].ord-97+1  : combined.first[0].ord-65+27
   end
   puts res
-else
+end
+
+def part2
   content = File.read("input.txt")
 
   set1 = Set(String).new
@@ -37,4 +41,3 @@ else
 
   puts res2
 end
-
