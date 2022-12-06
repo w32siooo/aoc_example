@@ -1,0 +1,4 @@
+FROM crystallang/crystal:0.35.1-alpine
+COPY . .
+RUN crystal build program.cr --static
+CMD ["./program"]
