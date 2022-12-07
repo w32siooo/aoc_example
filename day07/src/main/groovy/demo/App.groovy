@@ -14,9 +14,9 @@ import java.nio.file.Path
 class App {
 
     static day7BuildDirs() {
-        new File("build/aoc").deleteDir()
+        new File("./aoc").deleteDir()
 
-        new File("build/aoc").mkdir()
+        new File("./aoc").mkdir()
         Files.lines(Path.of("input7.txt"))
                 .skip(1)
                 .forEach { line ->
@@ -30,15 +30,15 @@ class App {
         println "Groovy"
         if (System.getenv("part") == "part1") {
             day7BuildDirs()
-            currentDir = "build/aoc"
+            currentDir = "./aoc"
             println part1()
         } else {
             day7BuildDirs()
-            currentDir = "build/aoc"
+            currentDir = "./aoc"
             println part2()
         }
     }
-    public static String currentDir = "build/aoc"
+    public static String currentDir = "./aoc"
     public static boolean writeMode = false
 
     static String part1() {
