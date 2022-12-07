@@ -1,9 +1,10 @@
-FROM gradle as BASE
-WORKDIR /src
-COPY ./ .
-RUN gradle clean build
+FROM ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.0 as BASE
+WORKDIR /opt/graalvm
+RUN gu install native-image
+COPY src/main/java .
+RUN javac *.java && native-image "--static" App
 
-FROM openjdk
-COPY input7.txt .
-COPY --from=BASE /src/build/libs/ .
-CMD java -jar demo.jar
+FROM alpine
+COPY --from=BASE /opt/graalvm/app app
+COPY input.txt .
+CMD ["./app"]
