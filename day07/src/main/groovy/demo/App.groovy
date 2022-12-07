@@ -14,14 +14,14 @@ import java.nio.file.Path
 class App {
 
     static day7BuildDirs() {
-        new File("./aoc").deleteDir()
+        new File(baseDir).deleteDir()
 
-        new File("./aoc").mkdir()
+        new File(baseDir).mkdir()
         Files.lines(Path.of("input7.txt"))
                 .skip(1)
                 .forEach { line ->
                     {
-                        findCommand(line)
+                        findAndFireCommand(line)
                     }
                 }
     }
@@ -30,21 +30,19 @@ class App {
         println "Groovy"
         if (System.getenv("part") == "part1") {
             day7BuildDirs()
-            currentDir = "./aoc"
             println part1()
         } else {
             day7BuildDirs()
-            currentDir = "./aoc"
             println part2()
         }
     }
-    public static String currentDir = "./aoc"
+    public static final String baseDir = String.format("%s%saoc", ".", File.separator)
+    public static String currentDir = String.format("%s/aoc", ".")
     public static boolean writeMode = false
 
     static String part1() {
         def sum = 0
-
-        Files.walk(Path.of(currentDir))
+        Files.walk(Path.of(baseDir))
                 .forEach { path ->
                     {
                         if (path.toFile().isDirectory()) {
@@ -57,51 +55,46 @@ class App {
     }
 
     static String part2() {
-        def totalSpace = 70000000
-        def needSpace = 30000000
-        def usedSpace = FileUtils.sizeOfDirectory(new File(currentDir))
-        def currentSpace = totalSpace - usedSpace
-        def list = [] as ArrayList<Integer>
-        Files.walk(Path.of(currentDir))
+
+        int totalSpace = 70000000, needSpace = 30000000, smallestDir = Integer.MAX_VALUE, usedSpace = (int) FileUtils.sizeOfDirectory(new File(baseDir)), currentSpace = totalSpace - usedSpace
+        Files.walk(Path.of(baseDir))
                 .forEach { path ->
                     {
                         if (path.toFile().isDirectory()) {
                             int size = (int) FileUtils.sizeOfDirectory(path.toFile())
-                            if (currentSpace + size >= needSpace) list.add(size)
+                            if (currentSpace + size >= needSpace && size < smallestDir) smallestDir = size
                         }
                     }
                 }
-        return list.sort()[0].toString()
+        return smallestDir
     }
 
-
-    static void findCommand(String s) {
+    static void findAndFireCommand(String s) {
         if (s.startsWith("\$ cd")) {
             if (s.contains("..")) {
                 currentDir = currentDir.substring(0, currentDir.lastIndexOf("/"))
             } else {
-                currentDir = String.format("%s/%s", currentDir, s.split(" ")[2])
+                currentDir = String.format("%s/%s", currentDir, s.find(/[\w.]+(?=$)/))
             }
             writeMode = false
-        }
-        if (s.contains("\$")) {
+        } else if (s.contains("\$")) {
             writeMode = false
         }
         if (writeMode) {
             if (s.contains("dir")) {
-                new File(String.format("%s/%s", currentDir, s.split(" ")[1])).mkdir()
+                new File(String.format("%s/%s", currentDir, s.find(/\s+([\w]+)/).trim())).mkdir()
             } else {
-                def file = new File(String.format("%s/%s_%s", currentDir, s.split(" ")[0], s.split(" ")[1]))
-                FileOutputStream fos = new FileOutputStream(file)
-                Random rd = new Random();
-                byte[] arr = new byte[s.split(" ")[0].toInteger()];
-                rd.nextBytes(arr);
-                fos.write(arr)
-                fos.close()
+                def fileSize = s.substring(0, s.lastIndexOf(" "))
+                def file = new File(String.format("%s/%s", currentDir, fileSize))
+                try(FileOutputStream fos = new FileOutputStream(file)){
+                    byte[] arr = new byte[fileSize.toInteger()];
+                    new Random().nextBytes(arr);
+                    fos.write(arr)
+                }
             }
         }
         if (s.contains("ls")) {
-            writeMode = true
+            writeMode = true // next line is a file or dir
         }
     }
 }
