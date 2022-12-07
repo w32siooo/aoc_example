@@ -6,8 +6,23 @@ package demo
 import spock.lang.Specification
 
 class AppTest extends Specification {
-    def "application can run"() {
-        expect:
+
+    def "ss"(){
+
+        when:
+        println("dir lswlpt".find(/(?![dir ])[a-zA-Z]*/))
+        println("dir lswlpt".split(" ")[1])
+
+        then:
         true
+    }
+
+    def "application can run"() {
+        when:
+        App.day7BuildDirs()
+        then:
+        App.part1() == "1749646"
+        App.part2() == "1498966"
+
     }
 }
