@@ -5,9 +5,180 @@ package demo
 
 import spock.lang.Specification
 
+import java.nio.file.Files
+
 class AppTest extends Specification {
-    def "application can run"() {
-        expect:
-        true
+    def "application can still run"() {
+        when:
+        def dim = 99
+        def dim2 = 99
+        int[][] arr = new int[dim][dim2];
+        def count = 0
+        Files.lines(new File("inputf.txt").toPath()).forEach(
+                { line ->
+                    for (int i = 0; i < line.length(); i++) {
+                        arr[count][i] = line.split("")[i].toInteger()
+                    }
+                    count++
+                }
+        )
+
+        def topScenic = []
+        for (int rows = 0; rows < arr.length; rows++) {
+            for (int cols = 0; cols < arr.length; cols++) {
+                def startTree = arr[rows][cols]
+                int scenicDown = 0, scenicUp = 0, scenicLeft = 0, scenicRight = 0
+                int lookCount = 1
+                boolean viewIsBlocked = false
+
+                //scan down
+                def pred = rows + lookCount < dim && !viewIsBlocked
+
+                while (rows + lookCount < dim && !viewIsBlocked) {
+                    def newTree = arr[rows + lookCount][cols]
+                    if (newTree < startTree) { // if current tree is bigger
+                        scenicDown++
+                    } else {
+                        scenicDown++
+                        viewIsBlocked = true
+                    }
+                    lookCount++
+                }
+                //scan up
+                lookCount = 1
+                viewIsBlocked = false
+                while (rows - lookCount >= 0 && !viewIsBlocked) {
+                    def newTree = arr[rows - lookCount][cols]
+                    if (newTree < startTree) { // if current tree is bigger
+                        //println newTree
+                        scenicUp++
+                    } else {
+                        scenicUp++
+                        viewIsBlocked = true
+                    }
+                    lookCount++
+                }
+                //scan left
+                viewIsBlocked = false
+                lookCount = 1
+                while (cols - lookCount >= 0 && !viewIsBlocked) {
+                    def newTree = arr[rows][cols - lookCount]
+                    if (newTree < startTree) { // if current tree is bigger
+                        scenicLeft++
+                    } else {
+                        scenicLeft++
+                        viewIsBlocked = true
+                    }
+                    lookCount++
+                }
+                viewIsBlocked = false
+                //scan right
+                lookCount = 1
+                while (cols + lookCount < dim && !viewIsBlocked) {
+                    def newTree = arr[rows][cols + lookCount]
+                    if (newTree < startTree) { // if current tree is bigger
+                        scenicRight++
+                    } else {
+                        scenicRight++
+                        viewIsBlocked = true
+                    }
+                    lookCount++
+                }
+
+                def totalScenic = scenicDown * scenicUp * scenicLeft * scenicRight
+
+                topScenic.add(totalScenic)
+            }
+        }
+
+        then:
+        topScenic.max() == 335580
+
     }
+
+    def "part1"() {
+        when:
+        def dim = 99
+        int[][] arr = new int[dim][dim];
+        def count = 0
+        Files.lines(new File("inputf.txt").toPath()).forEach(
+                { line ->
+                    for (int i = 0; i < line.length(); i++) {
+                        arr[count][i] = line.split("")[i].toInteger()
+                    }
+                    count++
+                }
+        )
+
+
+        def score = 0
+        def scored = new boolean[dim][dim]
+
+        for (int k = 1; k < arr.length - 1; k++) {
+            def currentTree = arr[0][k]
+            int lookCount = 1
+            while (lookCount < arr.length - 2) {
+                def newTree = arr[lookCount][k]
+                if (newTree > currentTree) { // if current tree is bigger
+                    currentTree = newTree
+                    if (!scored[lookCount][k]) {
+                        score++
+                        scored[lookCount][k] = true
+                    }
+                }
+                lookCount++
+            }
+        }
+        for (int k = 1; k < arr.length - 1; k++) {
+            def currentTree = arr[arr.length - 1][k]
+            int lookCount = arr.length - 2
+            while (lookCount > 0) {
+                def newTree = arr[lookCount][k]
+                if (newTree > currentTree) {
+                    currentTree = newTree
+                    if (!scored[lookCount][k]) {
+                        score++
+                        scored[lookCount][k] = true
+                    }
+                }
+                lookCount--
+            }
+        }
+        for (int k = 1; k < arr.length - 1; k++) {
+            def currentTree = arr[k][0]
+            int lookCount = 1
+            while (lookCount < arr.length - 1) {
+                def newTree = arr[k][lookCount]
+                if (newTree > currentTree) {
+                    currentTree = newTree
+                    if (!scored[k][lookCount]) {
+                        score++
+                        scored[k][lookCount] = true
+                    }
+                }
+                lookCount++
+            }
+        }
+        for (int k = 1; k < arr.length - 1; k++) {
+            def currentTree = arr[k][arr.length - 1]
+            int lookCount = arr.length - 2
+            while (lookCount > 0) {
+                def newTree = arr[k][lookCount]
+                if (newTree > currentTree) {
+                    currentTree = newTree
+                    if (!scored[k][lookCount]) {
+                        score++
+                        scored[k][lookCount] = true
+                    }
+                }
+                lookCount--
+            }
+        }
+
+        then:
+        score + (dim * 4 - 4) == 1827
+
+    }
+
+
 }
