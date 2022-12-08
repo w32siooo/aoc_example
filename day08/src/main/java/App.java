@@ -24,16 +24,9 @@ public class App {
     public static void part1() throws IOException {
         var score = 0;
 
-        AtomicInteger count = new AtomicInteger();
         final int[][] table = getTable();
         var scored = new boolean[table.length][table.length];
 
-        try (Stream<String> lines = Files.lines(new File("inputf.txt").toPath())) {
-            lines.map(line -> Arrays.stream(line.split("")).mapToInt(Integer::parseInt).toArray())
-                    .forEach(line -> {
-                        table[count.getAndIncrement()] = line;
-                    });
-        }
         for (int i = 0; i < 4; i++) {
             for (int pointer = 1; pointer < table.length - 1; pointer++) {
                 int x = 0, y = 0;
