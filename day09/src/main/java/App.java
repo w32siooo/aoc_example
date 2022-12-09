@@ -5,83 +5,74 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class App {
-    public static final int[][] directions = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // down, up, right, left
-
+    private static final List<int[]> rope = new ArrayList<>();
+    private static int ropeLength = 0;
     public static void main(String[] args) throws IOException {
 
         System.out.println("Java");
         if (Objects.equals(System.getenv("part"), "part1")) {
-            solve(2);
+            System.out.println(solve(2));
         } else {
-            solve(10);
+            System.out.println(solve(10));
         }
     }
 
-    public static void solve(int kCount) throws IOException {
+    public static Set<String> solve(String[] input) {
 
-        var inputList = parseInput();
+        var set = new HashSet<String>();
 
-        int gridWidth = 1000;
+        for (int i = 0; i < Integer.parseInt(input[1]); i++) {
+            switch (input[0]) {
+                case "R" -> rope.get(0)[1] = rope.get(0)[1] + 1;
+                case "U" -> rope.get(0)[0] = rope.get(0)[0] - 1;
+                case "L" -> rope.get(0)[1] = rope.get(0)[1] - 1;
+                case "D" -> rope.get(0)[0] = rope.get(0)[0] + 1;
+            }
 
-        char[][] tails = new char[gridWidth][gridWidth];
+            for (int knotIndex = 1; knotIndex < rope.size(); knotIndex++) {
+                int dist = (int) Math.sqrt((rope.get(knotIndex - 1)[0] - rope.get(knotIndex)[0])
+                        * (rope.get(knotIndex - 1)[0] - rope.get(knotIndex)[0])
+                        + (rope.get(knotIndex - 1)[1] - rope.get(knotIndex)[1])
+                        * (rope.get(knotIndex - 1)[1] - rope.get(knotIndex)[1]));
 
-        var knots = new ArrayList<int[]>();
-
-        for (int i = 0; i < kCount; i++) {
-            knots.add(new int[]{gridWidth / 2 + 4, gridWidth / 2});
-        }
-
-        for (String[] input : inputList
-        ) {
-            for (int i = 0; i < Integer.parseInt(input[1]); i++) {
-                switch (input[0]) {
-                    case "R" -> knots.get(0)[1] = knots.get(0)[1] + 1;
-                    case "U" -> knots.get(0)[0] = knots.get(0)[0] - 1;
-                    case "L" -> knots.get(0)[1] = knots.get(0)[1] - 1;
-                    case "D" -> knots.get(0)[0] = knots.get(0)[0] + 1;
-                }
-
-                for (int knotIndex = 1; knotIndex < knots.size(); knotIndex++) {
-                    int dist = (int) Math.sqrt((knots.get(knotIndex - 1)[0] - knots.get(knotIndex)[0])
-                            * (knots.get(knotIndex - 1)[0] - knots.get(knotIndex)[0])
-                            + (knots.get(knotIndex - 1)[1] - knots.get(knotIndex)[1])
-                            * (knots.get(knotIndex - 1)[1] - knots.get(knotIndex)[1]));
-
-                    if (dist > 1) {
-                        if (knots.get(knotIndex - 1)[1] - knots.get(knotIndex)[1] >= 1) { //head x 5 tail x 3 = 2 tail is behind add one
-                            knots.get(knotIndex)[1]++;
-                        }
-                        if (knots.get(knotIndex - 1)[1] - knots.get(knotIndex)[1] <= -1) { //head x 0 tail x 2 = -2 tail is behind subtract one
-                            knots.get(knotIndex)[1]--;
-                        }
-
-                        if (knots.get(knotIndex - 1)[0] - knots.get(knotIndex)[0] >= 1) { //head y 5 tail y 3 = 2 tail is behind add one
-                            knots.get(knotIndex)[0]++;
-                        }
-                        if (knots.get(knotIndex - 1)[0] - knots.get(knotIndex)[0] <= -1) { //head y 0 tail y 2 = -2 tail is behind subtract one
-                            knots.get(knotIndex)[0]--;
-                        }
+                if (dist > 1) {
+                    if (rope.get(knotIndex - 1)[1] - rope.get(knotIndex)[1] >= 1) {
+                        rope.get(knotIndex)[1]++;
+                    }
+                    if (rope.get(knotIndex - 1)[1] - rope.get(knotIndex)[1] <= -1) {
+                        rope.get(knotIndex)[1]--;
                     }
 
+                    if (rope.get(knotIndex - 1)[0] - rope.get(knotIndex)[0] >= 1) {
+                        rope.get(knotIndex)[0]++;
+                    }
+                    if (rope.get(knotIndex - 1)[0] - rope.get(knotIndex)[0] <= -1) {
+                        rope.get(knotIndex)[0]--;
+                    }
                 }
-                tails[knots.get(kCount-1)[0]][knots.get(kCount-1)[1]] = '#';
 
             }
-        }
-        int count = 0;
+            set.add(Arrays.toString(rope.get(ropeLength - 1)));
 
-        for (char[] x : tails) {
-            for (char y : x) {
-                if (y == '#') count++;
-            }
         }
-        System.out.println(count);
+        return set;
 
     }
-    private static List<String[]> parseInput() throws IOException {
+
+    private static long solve(int kCount) throws IOException {
+        ropeLength = kCount;
+        for (int i = 0; i < kCount; i++) {
+            rope.add(new int[]{0, 0});
+        }
 
         try (Stream<String> lines = Files.lines(new File("input.txt").toPath())) {
-            return lines.map(s -> s.split(" ")).toList();
+            return lines.map(s -> s.split(" "))
+                    .map(App::solve)
+                    .reduce((s1, s2) -> {
+                        s1.addAll(s2);
+                        return s1;
+                    }).orElseGet(HashSet::new)
+                    .size();
         }
     }
 
