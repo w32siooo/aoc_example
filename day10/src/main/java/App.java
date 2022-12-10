@@ -5,23 +5,23 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class App {
-  public static int cycles = 0;
-  public static String[][] array = new String[6][40];
-
-  static int signalStrength = 1;
-  static int sum = 0;
+  private static int cycles = 0;
+  private static int signalStrength = 1;
+  private static int sum = 0;
+  private static int part = 1;
 
   public static void main(String[] args) throws IOException {
 
     System.out.println("Java");
     if (Objects.equals(System.getenv("part"), "part1")) {
       cycles = 1;
+      part = 1;
       solve();
       System.out.println(sum);
     } else {
+      part = 2;
       cycles = 0;
       solve();
-      printMatrix(array);
     }
   }
 
@@ -35,11 +35,11 @@ public class App {
       case 180 -> sum += signalStrength * 180;
       case 220 -> sum += signalStrength * 220;
     }
-    drawX();
+    if(part==2) drawX();
     cycles++;
   }
 
-  public static void solve(String[] input) {
+  public static void sink(String[] input) {
 
     if (input[0].equals("addx")) {
       incrementCycle();
@@ -50,36 +50,24 @@ public class App {
     }
   }
 
-  public static void printMatrix(String[][] matrix) {
-    for (String[] strings : matrix) {
-      for (String string : strings) {
-        System.out.print(Objects.requireNonNullElse(string, " "));
-      }
-      System.out.println();
-    }
-  }
-
   private static void drawX() {
-    if (cycles < 240) {
-      int xToDraw = cycles;
-      if (cycles >= 40) {
-        xToDraw = cycles % 40;
-      }
-      int yToDraw = cycles / 40;
-
-      if (signalStrength == xToDraw
-          || signalStrength - 1 == xToDraw
-          || signalStrength + 1 == xToDraw) {
-        array[yToDraw][xToDraw] = "0";
-      }
+    int xToDraw = cycles % 40;
+    if (cycles % 40 == 0) {
+      System.out.print("\n");
+    }
+    if (signalStrength - 1 == xToDraw
+        || signalStrength == xToDraw
+        || signalStrength + 1 == xToDraw) {
+      System.out.print("%");
+    } else {
+      System.out.print(" ");
     }
   }
 
   private static void solve() throws IOException {
 
     try (Stream<String> lines = Files.lines(new File("input.txt").toPath())) {
-      lines.map(s -> s.split(" "))
-              .forEach(App::solve);
+      lines.map(s -> s.split(" ")).forEach(App::sink);
     }
   }
 }
