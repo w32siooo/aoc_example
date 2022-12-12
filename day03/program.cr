@@ -15,29 +15,13 @@ end
 
 def part2
   content = File.read("input.txt")
-
-  set1 = Set(String).new
-  set2 = Set(String).new
-  set3 = Set(String).new
-  counter = 0
-
-  res2 = 0 
-  content.each_line do |line|
-    line_set = line.split(//).to_set
-    if counter % 3 == 0
-      set1 = line_set
-    elsif counter % 3 == 1
-      set2 = line_set
-    else
-      set3 = line_set
-    end
-
-    if counter % 3 == 2
-      combined = set1 & set2 & set3
-      res2 += combined.first[0].ord > 90 ? combined.first[0].ord-97+1  : combined.first[0].ord-65+27
-    end
-    counter = counter + 1    
+  res2 = 0
+  content.each_line.each_slice(3) do |group|
+    group1 = group[0].split(//).to_set
+    group2 = group[1].split(//).to_set
+    group3 = group[2].split(//).to_set
+    combined = group1 & group2 & group3
+    res2 += combined.first[0].ord > 90 ? combined.first[0].ord-97+1  : combined.first[0].ord-65+27
   end
-
   puts res2
 end
