@@ -45,6 +45,7 @@ fn main() {
             result += 1;
         }
     }
+    println!("Rust");
 
     println!("{}", result);
 }
