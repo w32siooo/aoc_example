@@ -1,9 +1,4 @@
-FROM gradle as BASE
-WORKDIR /src
-COPY ./ .
-RUN gradle clean build
-
-FROM openjdk
-COPY input.txt .
-COPY --from=BASE /src/build/libs/ .
-CMD java -jar demo.jar
+FROM crystallang/crystal:0.35.1-alpine
+COPY . .
+RUN crystal build aoc.cr --static
+CMD ["./program"]

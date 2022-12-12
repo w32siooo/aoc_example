@@ -1,0 +1,17 @@
+List<Monkey> listOfMonkeys =
+        List.of(
+            new Monkey(List.of(73L, 77L), 11, i -> i * 5, 6, 5, worryManager),
+            new Monkey(List.of(57L, 88L, 80L), 19, (i) -> i + 5, 6, 0, worryManager),
+            new Monkey(List.of(61L, 81L, 84L, 69L, 77L, 88L), 5, (i) -> i * 19, 3, 1, worryManager),
+            new Monkey(
+                List.of(78L, 89L, 71L, 60L, 81L, 84L, 87L, 75L),
+                3,
+                (i) -> i + 7,
+                1,
+                0,
+                worryManager),
+            new Monkey(
+                List.of(60L, 76L, 90L, 63L, 86L, 87L, 89L), 13, (i) -> i + 2, 2, 7, worryManager),
+            new Monkey(List.of(88L), 17, (i) -> i + 1, 4, 7, worryManager),
+            new Monkey(List.of(84L, 98L, 78L, 85L), 7, (i) -> i * i, 5, 4, worryManager),
+            new Monkey(List.of(98L, 89L, 78L, 73L, 71L), 2, (i) -> i + 4, 3, 2, worryManager));

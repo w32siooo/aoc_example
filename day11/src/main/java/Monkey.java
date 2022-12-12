@@ -1,68 +1,50 @@
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.function.LongUnaryOperator;
+import java.util.function.Supplier;
 
 public class Monkey {
-
   private final Long test;
-  public Deque<Long> queue = new LinkedList<>();
-  boolean factor;
-  private int opValue;
-  private int falseDestMonkey;
-  private int trueDestMonkey;
-
-  private AtomicInteger inspectCount = new AtomicInteger(0);
+  private Queue<Long> itemList;
+  private final LongUnaryOperator operation;
+  private final int falseDestMonkey;
+  private final int trueDestMonkey;
+  private final AtomicInteger inspectCount = new AtomicInteger(0);
+  private final Supplier<LongUnaryOperator> worryManager;
 
   public Monkey(
-      List<Integer> initWorryLevels,
+      List<Long> initWorryLevels,
       int test,
-      int opValue,
-      boolean factor,
+      LongUnaryOperator operation,
       int trueDestMonkey,
-      int falseDestMonkey) {
-    initWorryLevels.stream().map(Integer::longValue).forEach(queue::addLast);
+      int falseDestMonkey,
+      Supplier<LongUnaryOperator> worryManager) {
+    this.itemList = new LinkedList<>(initWorryLevels);
     this.test = (long) test;
-    this.factor = factor;
-    this.opValue = opValue;
+    this.operation = operation;
     this.falseDestMonkey = falseDestMonkey;
     this.trueDestMonkey = trueDestMonkey;
-  }
-
-  public void printQueue() {
-    System.out.println(Arrays.toString(queue.toArray()));
+    this.worryManager = worryManager;
   }
 
   public int getInspectCount() {
     return inspectCount.get();
   }
 
-  public long[] inspect() {
+  public void addItem(Long item) {
+    itemList.add(item);
+  }
+
+  public long[] inspect(long itemIn) {
     inspectCount.incrementAndGet();
-    int destMonkey;
-    Long item = queue.removeLast();
-    item = item % (11 * 19 * 5 * 3 * 13 * 17 * 7 * 2);
-    if (opValue == 1337) {
-      item = item * item;
-    } else {
-      if (factor) {
-        item = item * opValue;
-      } else {
-        item = item + opValue;
-      }
-    }
-
-    if (item % test == 0) {
-      destMonkey = trueDestMonkey;
-    } else {
-      destMonkey = falseDestMonkey;
-    }
-    return new long[] {(long) destMonkey, item};
+    long item = worryManager.get().applyAsLong(operation.applyAsLong(itemIn));
+    return new long[] {item % test == 0 ? trueDestMonkey : falseDestMonkey, item};
   }
 
-  public boolean isQueueEmpty() {
-    return queue.isEmpty();
+  public Queue<Long> grabAndClearItems() {
+    Queue<Long> res = new LinkedList<>(itemList);
+    itemList = new LinkedList<>();
+    return res;
   }
+
 }
