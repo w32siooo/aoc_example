@@ -21,13 +21,12 @@ public class App {
 
   private static void solve(int rounds, boolean round1) throws IOException {
     Supplier<LongUnaryOperator> worryManager = () -> (i) -> i / 3;
-    if (!round1) {
-      worryManager = () -> (i) -> i % (11 * 19 * 5 * 3 * 13 * 17 * 7 * 2);
-    }
+
     Supplier<LongUnaryOperator> finalWorryManager = worryManager;
     var res = Files.readString(Paths.get("input.txt")).split("\\n\\n");
     List<Monkey> newMonkeys = new ArrayList<>();
 
+    int lcd = 1;
     for (String re : res) {
       var inLines = re.split("\n");
       var commaSeperated = inLines[1].split(":");
@@ -61,6 +60,7 @@ public class App {
       if (m.find()) {
         String test2 = m.group();
         test = Integer.parseInt(test2);
+        lcd = lcd * test;
       }
       int trueDestMonkey = 0;
       int falseDestMonkey = 0;
@@ -83,6 +83,13 @@ public class App {
                       trueDestMonkey,
                       falseDestMonkey,
                       finalWorryManager));
+
+    }
+
+    if (!round1) {
+      int finalLcd = lcd;
+      Supplier<LongUnaryOperator> finalWorryManager1 = () -> (i) -> i % finalLcd;
+      newMonkeys.forEach(monkey -> monkey.updateWorryManager(finalWorryManager1));
     }
 
     for (int i = 1; i < rounds + 1; i++) {
@@ -94,7 +101,7 @@ public class App {
                       inspectRes -> newMonkeys.get((int) inspectRes[0]).addItem(inspectRes[1])));
     }
 
-    var resz =
+    var result =
         newMonkeys.stream()
             .map(Monkey::getInspectCount)
             .mapToLong(Integer::longValue)
@@ -103,6 +110,6 @@ public class App {
             .skip(6)
             .reduce((a, b) -> a * b)
             .orElseThrow(() -> new IllegalArgumentException("No value present"));
-    System.out.println(resz);
+    System.out.println(result);
   }
 }

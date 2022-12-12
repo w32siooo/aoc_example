@@ -10,7 +10,7 @@ public class Monkey {
   private final int falseDestMonkey;
   private final int trueDestMonkey;
   private final AtomicInteger inspectCount = new AtomicInteger(0);
-  private final Supplier<LongUnaryOperator> worryManager;
+  private Supplier<LongUnaryOperator> worryManager;
 
   public Monkey(
       List<Long> initWorryLevels,
@@ -24,6 +24,10 @@ public class Monkey {
     this.operation = operation;
     this.falseDestMonkey = falseDestMonkey;
     this.trueDestMonkey = trueDestMonkey;
+    this.worryManager = worryManager;
+  }
+
+  public void updateWorryManager(Supplier<LongUnaryOperator> worryManager) {
     this.worryManager = worryManager;
   }
 
