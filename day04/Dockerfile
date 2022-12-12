@@ -1,10 +1,9 @@
-FROM ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.0 as BASE
-WORKDIR /opt/graalvm
-RUN gu install native-image
-COPY src/main/java .
-RUN javac *.java && native-image "--static" App
+FROM rust:1.61 as builder
+WORKDIR /usr/src/day04
+COPY . .
+RUN cargo install --path .
 
-FROM alpine
-COPY --from=BASE /opt/graalvm/app app
-COPY input3.txt .
-CMD ["./app"]
+FROM debian:buster-slim
+COPY --from=builder /usr/local/cargo/bin/day04 /usr/local/bin/day04
+COPY input.txt .
+CMD ["day04"]
