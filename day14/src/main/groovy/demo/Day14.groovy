@@ -16,18 +16,18 @@ class Day14 {
     }
 
     private static long simulateSand(ArrayList<int[]> rockList) {
-        if (System.getenv("part") == "part2") {
+       // if (System.getenv("part") == "part2") {
             def highest = []
             rockList.forEach(s-> highest<< s[1])
             def wallY = highest.sort().reverse()[0]+2
             IntRange range = new IntRange(0, 100000)
             range.forEach(s -> rockList << ([s, wallY] as int[]))
-        }
+
 
         def sandX = 500
         def sandY = 0
 
-        String[][] twoDArray = new String[100001][200]
+        String[][] twoDArray = new String[100001][1000]
 
         for (int i = 0; i < twoDArray.length; i++) {
             for (int j = 0; j < twoDArray[i].length; j++) {

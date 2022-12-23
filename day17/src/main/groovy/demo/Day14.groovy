@@ -5,9 +5,18 @@ import java.nio.file.Path
 import java.util.stream.Stream
 
 class Day14 {
+
     private static Stream<String> getInput() {
-        var rockList = Files.lines(Path.of("input.txt"))
+        var rockList = Files.lines(Path.of("input2.txt"))
                 .flatMap(s -> s.split("").toList().stream())
+    }
+    public class Stats {
+        int height
+        int rockType
+        public Stats(int height, int rockType) {
+            this.height = height
+            this.rockType = rockType
+        }
     }
 
     public static void simulateRock() {
@@ -18,15 +27,9 @@ class Day14 {
         int rockType = 0 // 0: Z + L I #
         int jetCount = 0
 
-        String[][] rockMap = new String[25][7]
-        for (int i = 0; i < rockMap.length; i++) {
-            for (int j = 0; j < rockMap[i].length; j++) {
-                if (rockMap[i][j] == null) {
-                    rockMap[i][j] = "."
-                }
-            }
-        }
-        for (i in 1..<2023) {
+        Map<String,Integer> patternMap = [:]
+
+        for (i in 1..<100000) {
             int minX = 0
             int maxX = 0
             int currentY = highestY + 4
@@ -66,11 +69,8 @@ class Day14 {
             boolean toRest = false
             while (!toRest) {
                 positions.forEach { position ->
-                    //     rockMap[position[1]][position[0]] = "#"
                 }
-                // printMatrix(rockMap)
                 positions.forEach { position ->
-                    //   rockMap[position[1]][position[0]] = "."
                 }
                 int pushX = jetList.get(jetCount) == ">" ? 1 : -1
                 if (canPush(maxX, pushX, minX, positions, rockSet)) {
@@ -83,7 +83,6 @@ class Day14 {
                 if (jetCount == jetList.size()) {
                     jetCount = 0
                 }
-                // println("=====================================")
 
                 var tempPositions = positions.stream().map(pos -> new int[]{pos[0], pos[1] - 1}).toList()
 
@@ -100,49 +99,30 @@ class Day14 {
                     positions = tempPositions
                 } else {
                     positions.forEach { position ->
-                        //    rockMap[position[1]][position[0]] = "%"
                         rockSet.add(Arrays.toString(position))
                         //   println("laid to rest: " + Arrays.toString(position))
                         if (position[1] > highestY) {
                             highestY = position[1]
                         }
                     }
-                    println(highestY)
                 }
 
             }// while loop end
 
+            if(rockSet.size() > 1500){
+                rockSet= rockSet.subList(rockSet.size()-1500,rockSet.size())
+            }
+            patternMap.put(String.format("%s %s",jetCount,rockType), rockType)
+
             rockType = rockType == 4 ? 0 : rockType + 1
         }
-
-
-
-        int maxY = 0
-
-
+        highestY++;
+        println(highestY)
 
     }
 
-    private static void printMatrix(String[][] matrix) {
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j]);
-            }
-            System.out.println();
-        }
-    }
 
-    private static List<int[]> movePositionsOneYDown(List<int[]> positions) {
-        positions = positions.stream().map(pos -> new int[]{pos[0], pos[1] - 1}).toList()
-        positions
-    }
 
-    private static int resetMoveList(int movelistCount, List<String> moveList) {
-        if (movelistCount == moveList.size() - 1) {
-            movelistCount = 0;
-        }
-        movelistCount
-    }
 
     private static boolean canPush(int maxX, int pushX, int minX, List<int[]> positions, ArrayList<String> rockSet) {
         boolean canPush = true
@@ -156,9 +136,14 @@ class Day14 {
     }
 
 
-    static void main(String[] args) {
+       static void main(String[] args) {
         println "Groovy"
-        simulateRock()
+
+        if (System.getenv("part") == "part1") {
+            println simulateRock()
+        } else {
+            println simulateRock()
+        }
     }
 
 }
